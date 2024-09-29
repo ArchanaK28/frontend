@@ -3,7 +3,7 @@ import { Link, useParams } from 'react-router-dom';
 import { Row, Col, ListGroup, Image, Form, Button, Card} from 'react-bootstrap';
 import Message from '../components/Message';
 import Loader from '../components/Loader';
-import { useGetOrderDetailsQuery ,usePayOrderMutation, useGetPayPalClientIdQuery} from '../slices/ordersApiSlice';
+import { useGetOrderDetailsQuery ,usePayOrderMutation, useGetPaypalClientIdQuery} from '../slices/ordersApiSlice';
 import { PayPalButtons, usePayPalScriptReducer } from '@paypal/react-paypal-js';
 import { toast } from 'react-toastify';
 import { useSelector } from 'react-redux';
@@ -18,7 +18,7 @@ const OrderScreen = () => {
 
   const [{ isPending }, paypalDispatch ] = usePayPalScriptReducer();
 
-  const { data: paypal, isLoading: loadingPayPal, error: errorPayPal } = useGetPayPalClientIdQuery();
+  const { data: paypal, isLoading: loadingPayPal, error: errorPayPal } = useGetPaypalClientIdQuery();
 
   const { userInfo } = useSelector((state) => state.auth);
   

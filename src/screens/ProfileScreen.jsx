@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Table, Form, Button, Row, Col } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
 import { FaTimes } from 'react-icons/fa';
+
 import { toast } from 'react-toastify';
 import Message from '../components/Message';
 import Loader from '../components/Loader';
@@ -16,27 +17,33 @@ const ProfileScreen = () => {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
 
-  const dispatch = useDispatch();
   const { userInfo } = useSelector((state) => state.auth);
+
   const { data: orders, isLoading, error } = useGetMyOrdersQuery();
 
-  const [updateProfile, { isLoading: loadingUpdateProfile }] = useProfileMutation();
+  const [updateProfile, { isLoading: loadingUpdateProfile }] =
+    useProfileMutation();
 
   useEffect(() => {
-    if (userInfo) {
-      setName(userInfo.name);
-      setEmail(userInfo.email);
-    }
-  }, [userInfo]);
+    setName(userInfo.name);
+    setEmail(userInfo.email);
+  }, [userInfo.email, userInfo.name]);
 
+  const dispatch = useDispatch();
   const submitHandler = async (e) => {
     e.preventDefault();
-
     if (password !== confirmPassword) {
       toast.error('Passwords do not match');
     } else {
       try {
-        const res = await updateProfile({ name, email, password }).unwrap();
+        const res = await updateProfile({
+          // NOTE: here we don't need the _id in the request payload as this is
+          // not used in our controller.
+          // _id: userInfo._id,
+          name,
+          email,
+          password,
+        }).unwrap();
         dispatch(setCredentials({ ...res }));
         toast.success('Profile updated successfully');
       } catch (err) {
@@ -49,6 +56,7 @@ const ProfileScreen = () => {
     <Row>
       <Col md={3}>
         <h2>User Profile</h2>
+
         <Form onSubmit={submitHandler}>
           <Form.Group className='my-2' controlId='name'>
             <Form.Label>Name</Form.Label>
@@ -96,13 +104,14 @@ const ProfileScreen = () => {
           {loadingUpdateProfile && <Loader />}
         </Form>
       </Col>
-
       <Col md={9}>
         <h2>My Orders</h2>
         {isLoading ? (
           <Loader />
         ) : error ? (
-          <Message variant='danger'>{error?.data?.message || error.error}</Message>
+          <Message variant='danger'>
+            {error?.data?.message || error.error}
+          </Message>
         ) : (
           <Table striped hover responsive className='table-sm'>
             <thead>
